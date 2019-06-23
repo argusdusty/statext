@@ -37,13 +37,13 @@ func runDirichletWinnerRandTestCase(a []float64, t *testing.T, full bool) {
 }
 
 func TestDirichletWinner(t *testing.T) {
-	test_cases := [][2][]float64{
+	testCases := [][2][]float64{
 		{{5.5, 10.5, 15.5}, {0.006730827936742794, 0.15691248315301745, 0.83635668891024}},
 		{{50.5, 100.5, 150.5}, {1.2913384498578148e-13, 0.0007572193068734463, 0.9992427806931501}},
 	}
-	for _, test_case := range test_cases {
-		runDirichletWinnerTestCase(test_case[0], test_case[1], t)
-		runDirichletWinnerTestCase(test_case[0], test_case[1], t) // Test to make sure test_case[1] isn't altered
+	for _, testCase := range testCases {
+		runDirichletWinnerTestCase(testCase[0], testCase[1], t)
+		runDirichletWinnerTestCase(testCase[0], testCase[1], t) // Test to make sure testCase[1] isn't altered
 	}
 	for i := 0; i < 100; i++ {
 		n := rand.Intn(10) + 1

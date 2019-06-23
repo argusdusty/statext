@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	MAX_DEPTH = 50 // Integrate to at most this depth (should never be reached)
-	MIN_DEPTH = 2  // Integrate to at least this depth
+	maxDepth = 50 // Integrate to at most this depth (should never be reached)
+	minDepth = 2  // Integrate to at least this depth
 )
 
 // dirichletWinnerAdaptiveQuadFunc is the function to integrate for the
@@ -46,9 +46,9 @@ func dirichletWinnerAdaptiveQuadFunc(avgAlpha, y float64, alphas, result, lgamma
 // dirichletWinnerAdaptiveQuadRecursive implements an adaptive quadrature
 // integration over dirichletWinnerAdaptiveQuadFunc.
 // Works in-place on result array.
-func dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, s, e float64, fs, fe, alphas, result, lgammas, ft []float64, depth, min_depth int) {
+func dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, s, e float64, fs, fe, alphas, result, lgammas, ft []float64, depth, mnDepth int) {
 	n := len(result)
-	if depth == MAX_DEPTH {
+	if depth == maxDepth {
 		for i := 0; i < n; i++ {
 			// Average the endpoints and return
 			result[i] += (fs[i] + fe[i]) * (e - s) / 2
@@ -61,10 +61,10 @@ func dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, s, e float64, fs, fe, a
 	for i := 0; i < n; i++ {
 		Q = (fs[i] + fe[i]) * (e - s) / 2
 		Q2 = (fs[i] + 4*ft[i] + fe[i]) * (e - s) / 6
-		if math.Abs(Q-Q2) >= tol || depth < min_depth {
+		if math.Abs(Q-Q2) >= tol || depth < mnDepth {
 			// Error too large, divide
-			dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, s, (s+e)/2, fs, ft[:n], alphas, result, lgammas, ft[n:], depth+1, min_depth) // Left-half integration
-			dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, (s+e)/2, e, ft[:n], fe, alphas, result, lgammas, ft[n:], depth+1, min_depth) // Right-half integration
+			dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, s, (s+e)/2, fs, ft[:n], alphas, result, lgammas, ft[n:], depth+1, mnDepth) // Left-half integration
+			dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, (s+e)/2, e, ft[:n], fe, alphas, result, lgammas, ft[n:], depth+1, mnDepth) // Right-half integration
 			return
 		}
 	}
@@ -101,11 +101,10 @@ func DirichletWinner(alphas []float64, tol float64) []float64 {
 	avgAlpha /= float64(n)
 	fs := make([]float64, n)                                            // function result at start point (0.0)
 	fe := make([]float64, n)                                            // function result at end point (1.0)
-	ft := make([]float64, MAX_DEPTH*n)                                  // Buffer space to use as fs/fe at lower depths
+	ft := make([]float64, maxDepth*n)                                   // Buffer space to use as fs/fe at lower depths
 	dirichletWinnerAdaptiveQuadFunc(avgAlpha, 0.0, alphas, fs, lgammas) // Compute start point function result
 	dirichletWinnerAdaptiveQuadFunc(avgAlpha, 1.0, alphas, fe, lgammas) // Compute end point function result
-	md := MIN_DEPTH
-	for {
+	for md := minDepth; md < maxDepth; md++ {
 		dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, 0.0, 1.0, fs, fe, alphas, result, lgammas, ft, 0, md)
 		var sr float64
 		for _, v := range result {
@@ -114,10 +113,9 @@ func DirichletWinner(alphas []float64, tol float64) []float64 {
 		if math.Abs(sr-1) <= float64(2*n)*tol {
 			break
 		}
-		for i, _ := range result {
+		for i := range result {
 			result[i] = 0
 		}
-		md++
 	}
 	return result
 }
