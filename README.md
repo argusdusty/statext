@@ -1,4 +1,4 @@
-# statext
+# statext [![GoDoc][godoc-badge]][godoc] [![Build Status][travis-ci-badge]][travis-ci] [![Report Card][report-card-badge]][report-card]
 Extra probability distributions and statistics utilities for Go
 
 Package statext provides additional probability distributions in gonum format, and statistics utilities.
@@ -8,3 +8,13 @@ Currently, this library has:
 - DirichletWinner: A function to compute the probabilities that each output will be the largest when randomly sampling a Dirichlet distribution. Uses a custom adaptive quadrature integration method to efficiently compute the probabilities within a specified tolerance.
 
 More is planned.
+
+## License
+Original code is licensed under the MIT License found in the LICENSE file. Portions of the code are subject to the additional licenses found in THIRD_PARTY_LICENSES. All third party code is licensed either under a BSD or MIT license.
+
+[travis-ci-badge]:   https://api.travis-ci.org/argusdusty/statext.svg?branch=master
+[travis-ci]:         https://api.travis-ci.org/argusdusty/statext
+[godoc-badge]:       https://godoc.org/github.com/argusdusty/statext?status.svg
+[godoc]:             https://godoc.org/github.com/argusdusty/statext
+[report-card-badge]: https://goreportcard.com/badge/github.com/argusdusty/statext
+[report-card]:       https://goreportcard.com/report/github.com/argusdusty/statext

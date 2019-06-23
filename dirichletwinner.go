@@ -10,9 +10,6 @@ const (
 	MIN_DEPTH = 2  // Integrate to at least this depth
 )
 
-var cf int
-var tcf int
-
 // dirichletWinnerAdaptiveQuadFunc is the function to integrate for the
 // dirichlet winner probs.
 // Works in-place on result array.
@@ -26,9 +23,12 @@ func dirichletWinnerAdaptiveQuadFunc(avgAlpha, y float64, alphas, result, lgamma
 	x := avgAlpha * y / (1 - y)
 	cdfs := 1.0
 	var pdf, cdf float64
+	// Computes gamma(alphas[j]).pdf(x)*product(gamma(alphas[i]).cdf(x), i!=j) for each j
+	// Made faster by doing a single loop to compute each gamma(alphas[j]).pdf(x)/gamma(alphas[j]).cdf(x)
+	// And in the same loop computing product(gamma(alphas[j]).cdf(x))
+	// Then computing the final result by multiplying the pdf/cdf fractions by the cdfs product.
 	for j, alpha := range alphas {
 		pdf = math.Exp(math.Log(x)*(alpha-1) - x - lgammas[j])
-		//println(alpha, x)
 		cdf = mathext.GammaIncReg(alpha, x)
 		if cdf == 0.0 {
 			result[j] = 0.0
@@ -57,7 +57,6 @@ func dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, s, e float64, fs, fe, a
 		return
 	}
 	var Q, Q2 float64
-	cf++
 	dirichletWinnerAdaptiveQuadFunc(avgAlpha, (s+e)/2, alphas, ft[:n], lgammas)
 	for i := 0; i < n; i++ {
 		Q = (fs[i] + fe[i]) * (e - s) / 2
@@ -76,8 +75,9 @@ func dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, s, e float64, fs, fe, a
 }
 
 // DirichletWinner computes the probabilities that each
+// output value of the Dirichlet distribution will be the largest.
+// Uses an adaptive quadrature integration technique with the
 func DirichletWinner(alphas []float64, tol float64) []float64 {
-	cf = 0
 	n := len(alphas)
 	result := make([]float64, n)
 	if n == 1 {
@@ -91,7 +91,9 @@ func DirichletWinner(alphas []float64, tol float64) []float64 {
 		return result
 	}
 	lgammas := make([]float64, n)
-	var avgAlpha float64 // Pre-computed average of alpha values, used to speed things up
+	// Pre-computed average of alpha values
+	// Used to improve integration accuracy by focusing around the critical points
+	var avgAlpha float64
 	for j, alpha := range alphas {
 		lgammas[j], _ = math.Lgamma(alpha)
 		avgAlpha += alpha
@@ -101,7 +103,7 @@ func DirichletWinner(alphas []float64, tol float64) []float64 {
 	fe := make([]float64, n)                                            // function result at end point (1.0)
 	ft := make([]float64, MAX_DEPTH*n)                                  // Buffer space to use as fs/fe at lower depths
 	dirichletWinnerAdaptiveQuadFunc(avgAlpha, 0.0, alphas, fs, lgammas) // Compute start point function result
-	dirichletWinnerAdaptiveQuadFunc(avgAlpha, 1.0, alphas, fe, lgammas) // Compute start point function result
+	dirichletWinnerAdaptiveQuadFunc(avgAlpha, 1.0, alphas, fe, lgammas) // Compute end point function result
 	md := MIN_DEPTH
 	for {
 		dirichletWinnerAdaptiveQuadRecursive(tol, avgAlpha, 0.0, 1.0, fs, fe, alphas, result, lgammas, ft, 0, md)
@@ -117,6 +119,5 @@ func DirichletWinner(alphas []float64, tol float64) []float64 {
 		}
 		md++
 	}
-	tcf += cf
 	return result
 }
