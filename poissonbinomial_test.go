@@ -195,3 +195,33 @@ func testPoissonBinomial(t *testing.T, p PoissonBinomial, i int) {
 	checkProbDiscrete(t, i, x, p, tol)
 	checkCDFSurvival(t, i, x, p, tol)
 }
+
+func randProbs(n int) []float64 {
+	x := make([]float64, n)
+	for i := 0; i < n; i++ {
+		x[i] = rand.Float64()
+	}
+	return x
+}
+
+func BenchmarkPoissonBinomial(b *testing.B) {
+	for _, bm := range []struct {
+		size int
+		name string
+	}{
+		{4, "Tiny (4)"},
+		{64, "Small (64)"},
+		{1024, "Medium (1024)"},
+		{16384, "Large (16384)"},
+		{262144, "Huge (262144)"},
+	} {
+		x := randProbs(bm.size)
+		b.Run(bm.name, func(b *testing.B) {
+			b.SetBytes(int64(bm.size * 8))
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				NewPoissonBinomial(x, nil)
+			}
+		})
+	}
+}

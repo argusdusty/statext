@@ -45,6 +45,26 @@ func NewPoissonBinomial(p []float64, src rand.Source) PoissonBinomial {
 // computePmf computes the pmf of the Poisson binomial distribution
 // Running time: O(N*log(N)^2)
 func (p PoissonBinomial) computePmf() []float64 {
+	// Handle the small cases quickly
+	switch len(p.p) {
+	case 1:
+		return []float64{1 - p.p[0], p.p[0]}
+	case 2:
+		p0 := p.p[0]
+		p1 := p.p[1]
+		return []float64{(1 - p0) * (1 - p1), (1-p0)*p1 + p0*(1-p1), p0 * p1}
+	case 3:
+		p0 := p.p[0]
+		p1 := p.p[1]
+		p2 := p.p[2]
+		return []float64{(1 - p0) * (1 - p1) * (1 - p2), (1-p0)*(1-p1)*p2 + (1-p0)*p1*(1-p2) + p0*(1-p1)*(1-p2), p0*p1*(1-p2) + p0*(1-p1)*p2 + (1-p0)*p1*p2, p0 * p1 * p2}
+	case 4:
+		p0 := p.p[0]
+		p1 := p.p[1]
+		p2 := p.p[2]
+		p3 := p.p[3]
+		return []float64{(1 - p0) * (1 - p1) * (1 - p2) * (1 - p3), (1-p0)*(1-p1)*(1-p2)*p3 + (1-p0)*(1-p1)*p2*(1-p3) + (1-p0)*p1*(1-p2)*(1-p3) + p0*(1-p1)*(1-p2)*(1-p3), (1-p0)*(1-p1)*p2*p3 + (1-p0)*p1*(1-p2)*p3 + p0*(1-p1)*(1-p2)*p3 + (1-p0)*p1*p2*(1-p3) + p0*(1-p1)*p2*(1-p3) + p0*p1*(1-p2)*(1-p3), (1-p0)*p1*p2*p3 + p0*(1-p1)*p2*p3 + p0*p1*(1-p2)*p3 + p0*p1*p2*(1-p3), p0 * p1 * p2 * p3}
+	}
 	m := 4 // Starting block size
 	N := len(p.p) + 1
 	n := gofft.NextPow2(N)          // Number of probability arrays to convolve
