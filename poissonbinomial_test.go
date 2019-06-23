@@ -66,6 +66,11 @@ func TestPoissonBinomialProb(t *testing.T) {
 			2,
 			0.0,
 		},
+		{
+			NewPoissonBinomial([]float64{0.1, 0.2, 0.3, 0.4}, nil),
+			2,
+			0.2144,
+		},
 	} {
 		p := test.Dir.Prob(test.x)
 		if math.Abs(p-test.prob) > tol {
