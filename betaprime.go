@@ -88,9 +88,8 @@ func (b BetaPrime) Quantile(p float64) float64 {
 func (b BetaPrime) Rand() float64 {
 	if b.Src != nil {
 		return b.Quantile(rand.New(b.Src).Float64())
-	} else {
-		return b.Quantile(rand.Float64())
 	}
+	return b.Quantile(rand.Float64())
 }
 
 // Skewness returns the skewness of the distribution.
