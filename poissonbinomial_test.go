@@ -214,11 +214,11 @@ func BenchmarkPoissonBinomial(b *testing.B) {
 		size int
 		name string
 	}{
-		{4, "Tiny (4)"},
-		{64, "Small (64)"},
-		{1024, "Medium (1024)"},
-		{16384, "Large (16384)"},
-		{262144, "Huge (262144)"},
+		{3, "Tiny (3)"},
+		{63, "Small (63)"},
+		{1023, "Medium (1023)"},
+		{16383, "Large (16383)"},
+		{262143, "Huge (262143)"},
 	} {
 		x := randProbs(bm.size)
 		b.Run(bm.name, func(b *testing.B) {
