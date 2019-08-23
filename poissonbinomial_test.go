@@ -1,8 +1,8 @@
 package statext
 
 import (
+	"golang.org/x/exp/rand"
 	"math"
-	"math/rand"
 	"sort"
 	"testing"
 )

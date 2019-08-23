@@ -2,9 +2,9 @@ package statext
 
 import (
 	"github.com/argusdusty/gofft"
+	"golang.org/x/exp/rand"
 	"gonum.org/v1/gonum/stat/sampleuv"
 	"math"
-	"math/rand"
 )
 
 // PoissonBinomial represents a random variable whose value is the sum of

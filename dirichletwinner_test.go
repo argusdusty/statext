@@ -62,7 +62,7 @@ func TestDirichletWinner(t *testing.T) {
 		}
 		runDirichletWinnerRandTestCase(a, t, true)
 	}
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 200; i++ {
 		n := rand.Intn(10) + 1
 		a := make([]float64, n)
 		ta := rand.ExpFloat64() * math.Pow(1.01, float64(i))
@@ -71,7 +71,7 @@ func TestDirichletWinner(t *testing.T) {
 		}
 		runDirichletWinnerRandTestCase(a, t, false)
 	}
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 200; i++ {
 		n := rand.Intn(10) + 1
 		a := make([]float64, n)
 		for j := 0; j < n; j++ {

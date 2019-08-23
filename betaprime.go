@@ -1,12 +1,12 @@
 package statext
 
 import (
+	"golang.org/x/exp/rand"
 	"gonum.org/v1/gonum/mathext"
 	"math"
-	"math/rand"
 )
 
-// BetaPrime implements the BetaPrime distribution, a two-parameter
+// BetaPrime implements the Beta prime distribution, a two-parameter
 // continuous distribution with support over the positive real numbers.
 //
 // The beta prime distribution has density function
